@@ -199,7 +199,7 @@ class ChessBoard():
         return board_matrix
     
     def add_move(self, move):
-        self.moves.append(move)
+        self.move.append(move)
     
     def last_move(self):
-        return self.moves[-1] if self.moves else None
+        return self.move[-1] if self.move else None
