@@ -46,7 +46,7 @@ class Pawn(ChessPieces):
                     moves.append(diag)
 
         # --- Bắt tốt qua đường (en passant) ---
-        last_move = board.last_move()
+        last_move = board.get_game().last_move()
         if last_move:
             from_idx, to_idx, moved_piece = last_move
             if moved_piece.__class__.__name__ == "Pawn":

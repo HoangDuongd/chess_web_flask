@@ -13,9 +13,10 @@ class ChessGame():
         self.players = [player1, player2]
         self.board: 'ChessBoard' = ChessBoard()
         self.current_turn = "white"  # hoặc random
-        self.winner = None
+        self.winner = "ongoing"
         self.ended = False
         self.setup()
+        self.moves = []
     
 
     def setup(self):
@@ -62,13 +63,19 @@ class ChessGame():
     def get_blackPlayer(self):
         return self.players[0] if self.players[0].get_color() == "black" else  self.players[1]
 
+    def add_move(self, move):
+        self.moves.append(move)
+
+    def last_move(self):
+        return self.moves[-1] if self.moves else None
+
     def Game_status(self):
         return self.ended
     
     def get_winner(self):
         return self.winner
     
-    def save_db(self):
+    def save_db(self): # factory method: save game into database
         db = SessionLocal() #  create database session
         try:
             result = self.get_winner()
@@ -80,6 +87,9 @@ class ChessGame():
                 )
             db.add(game)
             db.commit()
+            db.refresh(game)   # cập nhật lại đối tượng từ DB (đảm bảo có ID)
+        
+            self.id = game.ID_game   # gán id từ DB vào self.id
         finally:
             db.close()
     

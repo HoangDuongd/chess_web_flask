@@ -57,31 +57,45 @@ class ChessBoard():
 
 
     def move_piece(self, from_index, to_index):
+        
+        category = "move"                                               # infomation of motion: type of motion 
+                                                                        # category: "move" | "capture" | "castle_kingside" | "castle_queenside" | "en_passant" | "promotion" | "check" | "checkmate"
+        promotion = None                                                # infomation of motion: type of promotion (if piece is queen)
+                                                                        # promotion: "Q"|"R"|"B"|"N".
+
         piece = self.get_piece(from_index)
         position = list(divmod(to_index, 8))
-        if piece is not None :
-            if piece.get_color() == self.get_game().get_current_turn():
-                if  position in piece.legal_move():
+        if piece is not None :                                          # check if selected square has piece
+            if piece.get_color() == self.get_game().get_current_turn(): # check if piece color is belong to player who has turn 
+                if  position in piece.legal_move(): 
                     target = self.get_piece(to_index)
                     if target is not None:
                         target.get_player().remove_piece(target)
                         # (Optionally: gọi player.remove_piece(target) nếu bạn quản lý player)
+                        category = "capture" 
+                    else:
+                        category =  "move"
+                        
 
                     self.grid[to_index] = piece
                     self.grid[from_index] = None
                     row, col = divmod(to_index, 8)
                     piece.set_position(new_position = [row, col])
                     if isinstance(piece, King) or isinstance(piece, Rook):
-                        piece.set_hasmove()
-                     # --- Kiểm tra promotion ---
-                    from core.piece.pawn import Pawn  # tránh circular import thì đặt TYPE_CHECKING như bạn làm
+                        piece.set_hasmove()                             #check for castling method
+                    
+                    
+                    # --- Kiểm tra promotion ---
+                    from core.piece.pawn import Pawn                    # tránh circular import
                     if isinstance(piece, Pawn):
                         last_row = 7 if piece.get_color() == "white" else 0
                         if row == last_row:
                             self.promote_to_queen(to_index)
+                            category = "promotion"
+                            promotion = "Q"
 
                     # Ghi lại nước đi
-                    self.add_move((from_index, to_index, piece))
+                    self.get_game().add_move((from_index, to_index, piece, category, promotion))
 
                     # Chuyển lượt
                     self.get_game().switch_turn()
@@ -197,9 +211,3 @@ class ChessBoard():
             x += 1
         
         return board_matrix
-    
-    def add_move(self, move):
-        self.move.append(move)
-    
-    def last_move(self):
-        return self.move[-1] if self.move else None

@@ -10,7 +10,7 @@ class Game(Base):
     White_player = Column(Integer,ForeignKey("users.id"),nullable = False )
     Black_player = Column(Integer,ForeignKey("users.id"), nullable = False)
     Result = Column(Enum("ongoing","White wins", "Black wins", "draw", "abandoned"), default="ongoing")
-    PGN = Column(Text, nullable=True)  # Lưu toàn bộ nước đi ở định dạng PGN
+    LAN = Column(Text, nullable=True)  # Lưu toàn bộ nước đi ở định dạng PGN
     Date = Column(Date, default = datetime.now)
 
     def calculate_elo(self, result):
