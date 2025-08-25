@@ -1,4 +1,4 @@
-from chess_web.app import create_app ### import from internal file in app folder (__init__ file)
+from app import create_app ### import from internal file in app folder (__init__ file)
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 import os
 import sys

@@ -2,7 +2,7 @@ from core.AI.minimax import minimax
 from .player import Player
 class Bot_ROOKIE(Player):
     def __init__(self, user_id, name, color):
-        super().__init__(color, user_id=0, name="ROOKIE")
+        super().__init__(user_id=0, name="ROOKIE", color=color)
         self.bot_type = 'ROOKIE'
     def get_board(self):
         return super().get_board()

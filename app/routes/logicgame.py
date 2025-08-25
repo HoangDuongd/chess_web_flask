@@ -11,7 +11,7 @@ from core.chess_game.bot import Bot_ROOKIE
 player1 = Player("1", "Trắng", "white")
 # player2 = Player("2", "Đen", "black")                 * sua dong nay, ti sua lai
 bot = Bot_ROOKIE("2", "Đen", "black")    
-game = ChessGame(player1, bot)
+game = ChessGame(player1, bot, typegame="blizt")
 
 chessgame_bp = Blueprint('logicgame', __name__)
 

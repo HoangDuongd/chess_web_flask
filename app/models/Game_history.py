@@ -1,14 +1,14 @@
 from sqlalchemy import create_engine, Text, MetaData, Table, Column, Integer, String, Float, Boolean, ForeignKey, Date,  Enum
 from werkzeug.security import generate_password_hash, check_password_hash
-import datetime
+from datetime import datetime
 from app.db import Base
 
 class Game(Base):
     __tablename__ = "Game_history"
     ID_game = Column(Integer,unique=True, primary_key=True)
     Type_game = Column(Enum("blitz chess", "lightning", "super lightning"), nullable = False)
-    White_player = Column(Integer,ForeignKey("User.id"),nullable = False )
-    Black_player = Column(Integer,ForeignKey("User.id"), nullable = False)
+    White_player = Column(Integer,ForeignKey("users.id"),nullable = False )
+    Black_player = Column(Integer,ForeignKey("users.id"), nullable = False)
     Result = Column(Enum("ongoing","White wins", "Black wins", "draw", "abandoned"), default="ongoing")
     PGN = Column(Text, nullable=True)  # Lưu toàn bộ nước đi ở định dạng PGN
     Date = Column(Date, default = datetime.now)
