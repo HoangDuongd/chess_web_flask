@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Master - Trang chủ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home_style.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+            <a href="#" class="logo">Chess Master</a>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <a href="#" class="sidebar-logo">Chess Master</a>
+            
+            <div class="play-menu">
+                <button class="play-button" onclick="toggleDropdown()">
+                    Chơi cờ
+                </button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <button class="dropdown-item" onclick="playGame()">Chơi trực tuyến</button>
+                    <button class="dropdown-item" onclick="showBotSelection()">Chơi với Bot</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="hero-section">
+            <h1 class="hero-title">🏆 Chess Master</h1>
+            <p class="hero-subtitle">Chào mừng đến với thế giới cờ vua! Thách thức bản thân với các đối thủ AI hoặc chơi với người chơi khác trực tuyến.</p>
+            <a href="#" class="cta-button" onclick="showBotSelection()">Bắt đầu chơi ngay</a>
+        </section>
+    </main>
+
+    <!-- Bot Selection Modal -->
+    <div class="modal" id="botModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Chọn đối thủ Bot</h2>
+                <button class="close-btn" onclick="closeBotModal()">&times;</button>
+            </div>
+            <div class="bot-grid">
+                <div class="bot-card" onclick="playWithBot('rookie')">
+                    <div class="bot-avatar">🤖</div>
+                    <div class="bot-name">Rookie</div>
+                    <div class="bot-difficulty easy">Dễ</div>
+                </div>
+                <div class="bot-card" onclick="playWithBot('knight')">
+                    <div class="bot-avatar">♞</div>
+                    <div class="bot-name">Knight</div>
+                    <div class="bot-difficulty medium">Trung bình</div>
+                </div>
+                <div class="bot-card" onclick="playWithBot('master')">
+                    <div class="bot-avatar">👑</div>
+                    <div class="bot-name">Master</div>
+                    <div class="bot-difficulty hard">Khó</div>
+                </div>
+                <div class="bot-card" onclick="playWithBot('grandmaster')">
+                    <div class="bot-avatar">🧠</div>
+                    <div class="bot-name">Grandmaster</div>
+                    <div class="bot-difficulty expert">Chuyên gia</div>
+                </div>
+                <div class="bot-card" onclick="playWithBot('ai-supreme')">
+                    <div class="bot-avatar">🔥</div>
+                    <div class="bot-name">AI Supreme</div>
+                    <div class="bot-difficulty expert">Siêu khó</div>
+                </div>
+                <div class="bot-card" onclick="playWithBot('blitz-bot')">
+                    <div class="bot-avatar">⚡</div>
+                    <div class="bot-name">Blitz Bot</div>
+                    <div class="bot-difficulty medium">Cờ chớp</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const dropdown = document.getElementById('dropdownMenu');
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            dropdown.classList.remove('active');
+        }
+
+        // Dropdown functionality
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('active');
+        }
+
+        // Bot modal functionality
+        function showBotSelection() {
+            const modal = document.getElementById('botModal');
+            modal.classList.add('active');
+            closeSidebar();
+        }
+
+        function closeBotModal() {
+            const modal = document.getElementById('botModal');
+            modal.classList.remove('active');
+        }
+
+        // Game functions
+        function playGame() {
+            alert('Chuyển đến trang chơi trực tuyến...');
+            // window.location.href = 'play.html';
+            closeSidebar();
+        }
+
+        function playWithBot(botType) {
+            alert(`Bắt đầu trận đấu với ${botType}!`);
+            // window.location.href = `bot-game.html?bot=${botType}`;
+            closeBotModal();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const playMenu = document.querySelector('.play-menu');
+            const dropdown = document.getElementById('dropdownMenu');
+            
+            if (!playMenu.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('botModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeBotModal();
+            }
+        });
+    </script>
+</body>
+</html>

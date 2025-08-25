@@ -1,0 +1,5 @@
+class Config:
+    SECRET_KEY = '5d41402abc4b2a76b9719d911017c592'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///users.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    

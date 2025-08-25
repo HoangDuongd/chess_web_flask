@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login_register_style.css') }}">
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form id="registerForm">
+                <h1>Tạo tài khoản</h1>
+                <div class="social-container">
+                    <a href="#" class="social">📧</a>
+                    <a href="#" class="social">📘</a>
+                    <a href="#" class="social">🌐</a>
+                </div>
+                <span>hoặc sử dụng email để đăng ký</span>
+                <input type="text" name="username" placeholder="Họ và tên" required />
+                <input type="email" name="email" placeholder="Email" required />
+                <input type="password" name="password" placeholder="Mật khẩu" required />
+                <input type="password" name="confirm_password" placeholder="Xác nhận mật khẩu" required />
+                <button type="submit">Đăng ký</button>
+            </form>
+        </div>
+
+        <div class="form-container sign-in-container">
+            <form id="loginForm">
+                <h1>Đăng nhập</h1>
+                <div class="social-container">
+                    <a href="#" class="social">📧</a>
+                    <a href="#" class="social">📘</a>
+                    <a href="#" class="social">🌐</a>
+                </div>
+                <span>hoặc sử dụng tài khoản của bạn</span>
+                <input type="text" name="login_id" placeholder="Email hoặc tên đăng nhập" required />
+                <input type="password" name="password" placeholder="Mật khẩu" required />
+                <a href="#" style="color: #667eea; text-decoration: none; font-size: 14px; margin: 10px 0;">Quên mật khẩu?</a>
+                <button type="submit">Đăng nhập</button>
+            </form>
+        </div>
+
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Chào mừng trở lại!</h1>
+                    <p>Để giữ kết nối với chúng tôi, vui lòng đăng nhập bằng thông tin cá nhân của bạn</p>
+                    <button class="ghost" id="signIn">Đăng nhập</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Xin chào!</h1>
+                    <p>Nhập thông tin cá nhân của bạn và bắt đầu hành trình với chúng tôi</p>
+                    <button class="ghost" id="signUp">Đăng ký</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const container = document.getElementById('container');
+
+        signUpButton.addEventListener('click', () => {
+            container.classList.add("right-panel-active");
+        });
+
+        signInButton.addEventListener('click', () => {
+            container.classList.remove("right-panel-active");
+        });
+
+
+        async function handle_Register(data, button, originalText){
+            try {
+                const res = await fetch(`/api/register_user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    alert(result.message || 'Thành công!');
+                } else {
+                    alert(result.error || 'Lỗi xảy ra!');
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert('Có lỗi kết nối đến máy chủ');
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+
+
+        async function handle_Login(data, button, originalText) {
+            try {
+                const res = await fetch(`/api/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    alert(result.message || 'Thành công!');
+                    if (result.redirect_url) {
+                        window.location.href = result.redirect_url;
+                    }
+                } else {
+                    alert(result.error || 'Lỗi xảy ra!');
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert('Có lỗi kết nối đến máy chủ');
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Xử lý submit form
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Hiệu ứng loading
+                const button = form.querySelector('button[type="submit"]');
+                const originalText = button.textContent;
+                button.textContent = 'Đang xử lý...';
+                button.disabled = true;
+                
+                //API call
+                const formData = new FormData(form);
+                const data = {};
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+
+                let endpoint = '';
+                if (form.id === 'loginForm') {
+                    handle_Login(data, button, originalText)
+                } else if (form.id === 'registerForm') {
+                    handle_Register(data, button, originalText) 
+                }
+
+                
+            });
+        });
+
+        // Thêm hiệu ứng focus cho input
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ người dùng - Chess Master</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='member_style.css') }}">
+
+</head>
+<body>
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="avatar-container" onclick="changeAvatar()">
+                <div class="avatar" id="userAvatar">👤</div>
+                <div class="avatar-overlay">
+                    <div class="camera-icon">📷</div>
+                </div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarChange(event)">
+            
+            <div class="user-info">
+                <h1 class="username" contenteditable="true" id="username">ChessPlayer123</h1>
+                <p class="real-name" contenteditable="true" id="realName">Nguyễn Văn An</p>
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">1250</div>
+                        <div class="stat-label">ELO Rating</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">156</div>
+                        <div class="stat-label">Trận thắng</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">89</div>
+                        <div class="stat-label">Trận thua</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <div class="tabs-container">
+                <button class="tab-button active" onclick="switchTab(0, 'overview')">Tổng quan</button>
+                <button class="tab-button" onclick="switchTab(1, 'matches')">Các ván đấu</button>
+                <button class="tab-button" onclick="switchTab(2, 'statistics')">Thống kê</button>
+                <button class="tab-button" onclick="switchTab(3, 'friends')">Bạn bè</button>
+                <div class="tab-indicator" id="tabIndicator"></div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overview">
+                <h2 class="content-title">Tổng quan</h2>
+                <div class="overview-grid">
+                    <div class="info-card">
+                        <h3>Hoạt động gần đây</h3>
+                        <p>Thắng Knight Bot trong 25 nước</p>
+                        <p>Hòa với Master Bot</p>
+                        <p>Tham gia giải đấu hàng tuần</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Thành tích</h3>
+                        <p>🏆 Vô địch giải Rookie</p>
+                        <p>⭐ Thắng 10 trận liên tiếp</p>
+                        <p>🎯 Đạt 1200+ ELO</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Mục tiêu</h3>
+                        <p>Đạt ELO 1500</p>
+                        <p>Thắng Grandmaster Bot</p>
+                        <p>Tham gia giải quốc gia</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matches Tab -->
+            <div class="tab-content" id="matches">
+                <h2 class="content-title">Lịch sử các ván đấu</h2>
+                <div class="match-item">
+                    <div>
+                        <strong>vs Knight Bot</strong><br>
+                        <small>15 phút trước</small>
+                    </div>
+                    <div>
+                        <span>25 nước</span>
+                        <span class="match-result win">Thắng</span>
+                    </div>
+                </div>
+                <div class="match-item">
+                    <div>
+                        <strong>vs Master Bot</strong><br>
+                        <small>1 giờ trước</small>
+                    </div>
+                    <div>
+                        <span>42 nước</span>
+                        <span class="match-result draw">Hòa</span>
+                    </div>
+                </div>
+                <div class="match-item">
+                    <div>
+                        <strong>vs Player456</strong><br>
+                        <small>2 giờ trước</small>
+                    </div>
+                    <div>
+                        <span>33 nước</span>
+                        <span class="match-result win">Thắng</span>
+                    </div>
+                </div>
+                <div class="match-item">
+                    <div>
+                        <strong>vs Rookie Bot</strong><br>
+                        <small>1 ngày trước</small>
+                    </div>
+                    <div>
+                        <span>18 nước</span>
+                        <span class="match-result win">Thắng</span>
+                    </div>
+                </div>
+                <div class="match-item">
+                    <div>
+                        <strong>vs Grandmaster Bot</strong><br>
+                        <small>2 ngày trước</small>
+                    </div>
+                    <div>
+                        <span>51 nước</span>
+                        <span class="match-result loss">Thua</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div class="tab-content" id="statistics">
+                <h2 class="content-title">Số liệu thống kê</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>245</h3>
+                        <p>Tổng số trận</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>63.7%</h3>
+                        <p>Tỷ lệ thắng</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>28</h3>
+                        <p>Nước trung bình</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>12 phút</h3>
+                        <p>Thời gian TB/trận</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>8</h3>
+                        <p>Thắng liên tiếp tối đa</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>85%</h3>
+                        <p>Độ chính xác</p>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 2rem 0 1rem; color: #333;">Phân tích theo độ khó Bot</h3>
+                <div class="overview-grid">
+                    <div class="info-card">
+                        <h3 style="color: #10b981;">Rookie Bot</h3>
+                        <p><strong>24/25</strong> trận thắng</p>
+                        <p>Tỷ lệ thắng: 96%</p>
+                    </div>
+                    <div class="info-card">
+                        <h3 style="color: #f59e0b;">Knight Bot</h3>
+                        <p><strong>18/22</strong> trận thắng</p>
+                        <p>Tỷ lệ thắng: 82%</p>
+                    </div>
+                    <div class="info-card">
+                        <h3 style="color: #ef4444;">Master Bot</h3>
+                        <p><strong>8/15</strong> trận thắng</p>
+                        <p>Tỷ lệ thắng: 53%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Friends Tab -->
+            <div class="tab-content" id="friends">
+                <h2 class="content-title">Danh sách bạn bè (24)</h2>
+                <div class="friends-grid">
+                    <div class="friend-card">
+                        <div class="friend-avatar">👨</div>
+                        <div class="friend-info">
+                            <h4>ChessMaster89</h4>
+                            <p class="friend-status">Đang online</p>
+                        </div>
+                    </div>
+                    <div class="friend-card">
+                        <div class="friend-avatar">👩</div>
+                        <div class="friend-info">
+                            <h4>QueenPlayer</h4>
+                            <p class="friend-status">Đang online</p>
+                        </div>
+                    </div>
+                    <div class="friend-card">
+                        <div class="friend-avatar">👤</div>
+                        <div class="friend-info">
+                            <h4>RookieKnight</h4>
+                            <p class="friend-status" style="color: #6b7280;">Offline - 2h trước</p>
+                        </div>
+                    </div>
+                    <div class="friend-card">
+                        <div class="friend-avatar">🧔</div>
+                        <div class="friend-info">
+                            <h4>GrandmasterX</h4>
+                            <p class="friend-status">Đang online</p>
+                        </div>
+                    </div>
+                    <div class="friend-card">
+                        <div class="friend-avatar">👦</div>
+                        <div class="friend-info">
+                            <h4>YoungTalent</h4>
+                            <p class="friend-status" style="color: #6b7280;">Offline - 1 ngày</p>
+                        </div>
+                    </div>
+                    <div class="friend-card">
+                        <div class="friend-avatar">👩‍🦰</div>
+                        <div class="friend-info">
+                            <h4>ChessQueen2024</h4>
+                            <p class="friend-status">Đang online</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 0;
+
+        function switchTab(index, tabId) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            document.querySelectorAll('.tab-button')[index].classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            // Move indicator
+            const indicator = document.getElementById('tabIndicator');
+            indicator.style.left = `${index * 25}%`;
+            
+            currentTab = index;
+        }
+
+        function changeAvatar() {
+            document.getElementById('avatarInput').click();
+        }
+
+        function handleAvatarChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatar = document.getElementById('userAvatar');
+                    avatar.innerHTML = '';
+                    avatar.style.backgroundImage = `url(${e.target.result})`;
+                    avatar.style.backgroundSize = 'cover';
+                    avatar.style.backgroundPosition = 'center';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Save username and real name changes
+        document.getElementById('username').addEventListener('blur', function() {
+            console.log('Username changed to:', this.textContent);
+            // Ở đây bạn có thể thêm code để lưu vào database
+        });
+
+        document.getElementById('realName').addEventListener('blur', function() {
+            console.log('Real name changed to:', this.textContent);
+            // Ở đây bạn có thể thêm code để lưu vào database
+        });
+
+        // Initialize tab indicator position
+        document.addEventListener('DOMContentLoaded', function() {
+            switchTab(0, 'overview');
+        });
+    </script>
+</body>
+</html>
