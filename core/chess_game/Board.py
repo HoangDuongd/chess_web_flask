@@ -69,12 +69,19 @@ class ChessBoard():
             if piece.get_color() == self.get_game().get_current_turn(): # check if piece color is belong to player who has turn 
                 if  position in piece.legal_move(): 
                     target = self.get_piece(to_index)
+                    from core.piece.pawn import Pawn
                     if target is not None:
                         target.get_player().remove_piece(target)
                         # (Optionally: gọi player.remove_piece(target) nếu bạn quản lý player)
                         category = "capture" 
+                    
+                    elif isinstance(piece, Pawn):
+                        if from_index % 8 != to_index %8 :
+                            category = "en_passant"
+                    elif isinstance(piece, King) and abs(from_index - to_index) == 2:
+                        category="castle_kingside" if to_index > from_index else "castle_queenside"
                     else:
-                        category =  "move"
+                        category = "move"
                         
 
                     self.grid[to_index] = piece
@@ -86,7 +93,7 @@ class ChessBoard():
                     
                     
                     # --- Kiểm tra promotion ---
-                    from core.piece.pawn import Pawn                    # tránh circular import
+                    # from core.piece.pawn import Pawn                    # tránh circular import
                     if isinstance(piece, Pawn):
                         last_row = 7 if piece.get_color() == "white" else 0
                         if row == last_row:
@@ -101,7 +108,7 @@ class ChessBoard():
                     self.get_game().switch_turn()
 
 
-        if self.checkmate(to_index):
+        if self.checkmate(piece.get_player().get_opponent().get_color()):
             self.get_game().end_game(piece.get_player())
 
         
@@ -164,28 +171,62 @@ class ChessBoard():
     # nhập thành
         pass
 
-    def checkmate(self, index):
+    def checkmate(self, color):
         # chiếu hết
+        # legal_moves = []
+        # piece = self.get_piece(index)
+        # if piece is not None:
+        #     opponent = piece.get_player().get_opponent()
+        #     opponent_king_piece = opponent.get_king()
+        #     if opponent_king_piece.is_captured():
+        #         return True
+        #     else:
+        #         r, c = opponent_king_piece.get_position()
+        #         index_king_piece = [r,c]
+        #         if index_king_piece  in piece.legal_move():
+        #             for opponent_piece in opponent.get_pieces():
+        #                 if not opponent_piece.is_captured():
+        #                     legal_moves.extend(opponent_piece.legal_move())
+        #             return True if len(legal_moves) == 0 else False
+        #         else:
+        #             return False
+        # return False
         legal_moves = []
-        piece = self.get_piece(index)
-        if piece is not None:
-            opponent = piece.get_player().get_opponent()
-            opponent_king_piece = opponent.get_king()
-            if opponent_king_piece.is_captured():
-                return True
-            else:
-                r, c = opponent_king_piece.get_position()
-                index_king_piece = [r,c]
-                if index_king_piece  in piece.legal_move():
+        for player in self.players:
+            if player.get_color() == color:
+                opponent = player.get_opponent()
+                king_piece = player.get_king()
+                if king_piece.is_captured():
+                    return True
+                else:
+                    r,c = king_piece.get_position()
+                    index_king_piece = [r,c]
                     for opponent_piece in opponent.get_pieces():
                         if not opponent_piece.is_captured():
-                            legal_moves.extend(opponent_piece.legal_move())
-                    return True if len(legal_moves) == 0 else False
-                else:
+                            if index_king_piece in opponent_piece.legal_move():
+                                for piece in player.get_pieces():
+                                    if not piece.is_captured():
+                                        legal_moves.extend(piece.legal_move())
+                                return True if len(legal_moves) == 0 else False
                     return False
-            
-        return False
 
+
+
+    def check(self, color):
+        for player in self.players:
+            if player.get_color() == color:
+                opponent = player.get_opponent()
+                king_piece = player.get_king()
+                if king_piece.is_captured():
+                    return True
+                else:
+                    r,c = king_piece.get_position()
+                    index_king_piece = [r,c]
+                    for piece in opponent.get_pieces(self):
+                        if not piece.is_captured():
+                            if index_king_piece in piece.legal_move():
+                                return True
+                    return False
 
 
     def promote_to_queen(self, index):

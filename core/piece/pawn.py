@@ -48,7 +48,7 @@ class Pawn(ChessPieces):
         # --- Bắt tốt qua đường (en passant) ---
         last_move = board.get_game().last_move()
         if last_move:
-            from_idx, to_idx, moved_piece = last_move
+            from_idx, to_idx, moved_piece,category, promotion = last_move
             if moved_piece.__class__.__name__ == "Pawn":
                 fr, fc = divmod(from_idx, 8)
                 tr, tc = divmod(to_idx, 8)
