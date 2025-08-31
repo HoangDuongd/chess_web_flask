@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from core.piece import ChessPieces, king
     from .Board import ChessBoard
+else:
+    from core.piece import ChessPieces, king
 
 from typing import List, Optional
 

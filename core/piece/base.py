@@ -9,7 +9,7 @@ class ChessPieces(ABC):
     def __init__(self,  value, color, player:'Player', position=None, captured = False):
         self.value = value
         self.color = color
-        self.position = position
+        self.position = position # position = [r,c]
         self.captured = captured
         self.player = player
         self.symbol = None
@@ -32,6 +32,8 @@ class ChessPieces(ABC):
     def get_position(self):
         return self.position
 
+    def get_index(self):
+        return self.position[0] * 8 + self.position[1]
 
     def set_position(self, new_position):
         self.position = new_position

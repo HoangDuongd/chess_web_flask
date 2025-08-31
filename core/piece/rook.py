@@ -48,6 +48,9 @@ class Rook(ChessPieces):
     def get_position(self):
         return super().get_position()
 
+    def get_index(self):
+        return super().get_index()
+
     def set_position(self, new_position):
         return super().set_position(new_position)
 
@@ -77,3 +80,5 @@ class Rook(ChessPieces):
         return super().get_value()
     def set_hasmove(self):
         self.hasmove = True
+    def get_hasmove(self):
+        return self.hasmove

@@ -1,8 +1,8 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
-
+from typing import TYPE_CHECKING, Optional, Type
+from core.chess_game.move import MoveFactory, MoveResult
 if TYPE_CHECKING:
-    from core.piece import King,Queen,Bishop,Knight,Rook,Pawn
+    from core.piece import King,Queen,Bishop,Knight,Rook,Pawn, ChessPieces
     from .player import Player
     from .Game import ChessGame
 else:
@@ -49,74 +49,108 @@ class ChessBoard():
         for i in range(8):
             self.grid[8 + i] = Pawn(color="white",player=player1, position=[1, i])
             self.grid[48 + i] = Pawn(color="black",player=player2, position=[6, i])
-
+        # init Rook side
+        self.grid[4].set_Rook(self.grid[0], "Queen")
+        self.grid[4].set_Rook(self.grid[7], "King")
+        self.grid[60].set_Rook(self.grid[56],"Queen")
+        self.grid[60].set_Rook(self.grid[63],"King")
 
 
     def get_piece(self, index):
         return self.grid[index]
 
 
-    def move_piece(self, from_index, to_index):
+    # def move_piece(self, from_index, to_index):
         
-        category = "move"                                               # infomation of motion: type of motion 
-                                                                        # category: "move" | "capture" | "castle_kingside" | "castle_queenside" | "en_passant" | "promotion" | "check" | "checkmate"
-        promotion = None                                                # infomation of motion: type of promotion (if piece is queen)
-                                                                        # promotion: "Q"|"R"|"B"|"N".
+    #     category = "move"                                               # infomation of motion: type of motion 
+    #                                                                     # category: "move" | "capture" | "castle_kingside" | "castle_queenside" | "en_passant" | "promotion" | "check" | "checkmate"
+    #     promotion = None                                                # infomation of motion: type of promotion (if piece is queen)
+    #                                                                     # promotion: "Q"|"R"|"B"|"N".
 
+    #     piece = self.get_piece(from_index)
+    #     position = list(divmod(to_index, 8))
+    #     if piece is not None :                                          # check if selected square has piece
+    #         if piece.get_color() == self.get_game().get_current_turn(): # check if piece color is belong to player who has turn 
+    #             if  position in piece.legal_move(): 
+    #                 target = self.get_piece(to_index)
+    #                 from core.piece.pawn import Pawn
+    #                 if target is not None:
+    #                     target.get_player().remove_piece(target)
+    #                     # (Optionally: gọi player.remove_piece(target) nếu bạn quản lý player)
+    #                     category = "capture" 
+                    
+    #                 elif isinstance(piece, Pawn):
+    #                     if from_index % 8 != to_index %8 :
+    #                         category = "en_passant"
+    #                 elif isinstance(piece, King) and abs(from_index - to_index) == 2:
+    #                     category="castle_kingside" if to_index > from_index else "castle_queenside"
+    #                 else:
+    #                     category = "move"
+                        
+
+    #                 self.grid[to_index] = piece
+    #                 self.grid[from_index] = None
+    #                 row, col = divmod(to_index, 8)
+    #                 piece.set_position(new_position = [row, col])
+    #                 if isinstance(piece, King) or isinstance(piece, Rook):
+    #                     piece.set_hasmove()                             #check for castling method
+                    
+                    
+    #                 # --- Kiểm tra promotion ---
+    #                 # from core.piece.pawn import Pawn                    # tránh circular import
+    #                 if isinstance(piece, Pawn):
+    #                     last_row = 7 if piece.get_color() == "white" else 0
+    #                     if row == last_row:
+    #                         self.promote_to_queen(to_index)
+    #                         category = "promotion"
+    #                         promotion = "Q"
+
+    #                 # Ghi lại nước đi
+    #                 self.get_game().add_move((from_index, to_index, piece, category, promotion))
+
+    #                 # Chuyển lượt
+    #                 self.get_game().switch_turn()
+
+
+        # if self.checkmate(piece.get_player().get_opponent().get_color()):
+        #     self.get_game().end_game(piece.get_player())
+
+        
+
+    def move_piece(self, from_index, to_index, promotion_choice: Optional[type]=None):
         piece = self.get_piece(from_index)
         position = list(divmod(to_index, 8))
         if piece is not None :                                          # check if selected square has piece
-            if piece.get_color() == self.get_game().get_current_turn(): # check if piece color is belong to player who has turn 
+            if piece.get_color() == self.get_game().get_current_turn(): # check if piece color is belong to player who has turn
                 if  position in piece.legal_move(): 
-                    target = self.get_piece(to_index)
-                    from core.piece.pawn import Pawn
-                    if target is not None:
-                        target.get_player().remove_piece(target)
-                        # (Optionally: gọi player.remove_piece(target) nếu bạn quản lý player)
-                        category = "capture" 
-                    
-                    elif isinstance(piece, Pawn):
-                        if from_index % 8 != to_index %8 :
-                            category = "en_passant"
-                    elif isinstance(piece, King) and abs(from_index - to_index) == 2:
-                        category="castle_kingside" if to_index > from_index else "castle_queenside"
-                    else:
-                        category = "move"
-                        
+                    move = MoveFactory.create(from_index, to_index, piece, promotion_choice)
+                    annotations = move.apply(self)
+                    opponent_color = piece.get_player().get_opponent().get_color()
+                    move_result = MoveResult(move, annotations,self.check(opponent_color), self.checkmate(opponent_color),self.stalemate(opponent_color))
+                    self.get_game().add_move(move_result) # Ghi lại nước đi
+                    self.get_game().switch_turn()         # Chuyển lượt
 
-                    self.grid[to_index] = piece
-                    self.grid[from_index] = None
-                    row, col = divmod(to_index, 8)
-                    piece.set_position(new_position = [row, col])
-                    if isinstance(piece, King) or isinstance(piece, Rook):
-                        piece.set_hasmove()                             #check for castling method
-                    
-                    
-                    # --- Kiểm tra promotion ---
-                    # from core.piece.pawn import Pawn                    # tránh circular import
-                    if isinstance(piece, Pawn):
-                        last_row = 7 if piece.get_color() == "white" else 0
-                        if row == last_row:
-                            self.promote_to_queen(to_index)
-                            category = "promotion"
-                            promotion = "Q"
-
-                    # Ghi lại nước đi
-                    self.get_game().add_move((from_index, to_index, piece, category, promotion))
-
-                    # Chuyển lượt
-                    self.get_game().switch_turn()
-
-
-        if self.checkmate(piece.get_player().get_opponent().get_color()):
-            self.get_game().end_game(piece.get_player())
-
-        
-
-    def remove_piece(self, index):
-        self.grid[index] = None
+            if self.checkmate(piece.get_player().get_opponent().get_color()):
+                self.get_game().end_game(piece.get_player())
     
-    def simulate_move(self, from_index, to_index):
+    def remove_piece(self, index): 
+        piece = self.grid[index]
+        if piece is not None:
+            piece.set_position(new_position = None)                          # delete position memory of piece
+            piece.set_captured(True)                                         # set stage of piece: piece is captured
+        self.grid[index] = None                                              # delete piece in board
+
+    def set_piece(self, index, piece:'ChessPieces'):
+        if piece is not None:
+            from_idx = piece.get_index()
+            self.grid[from_idx] = None
+            self.grid[index] = piece
+            r,c = divmod(index, 8)
+            piece.set_position(new_position= [r,c])
+            if isinstance(piece, King) or isinstance(piece, Rook):
+                piece.set_hasmove()
+    
+    def simulate_move(self, from_index, to_index): # pre move
         piece = self.get_piece(from_index)
         captured = self.get_piece(to_index)
         if captured is not None:
@@ -126,7 +160,7 @@ class ChessBoard():
         piece.set_position([to_index // 8, to_index % 8])
         return captured
 
-    def undo_simulated_move(self, from_index, to_index, captured_piece):
+    def undo_simulated_move(self, from_index, to_index, captured_piece): # undo pre move
         piece = self.get_piece(to_index)
         self.grid[from_index] = piece
         if captured_piece is not None:
@@ -167,9 +201,6 @@ class ChessBoard():
     def get_game(self):
         return self.game
 
-    def castling(self):
-    # nhập thành
-        pass
 
     def checkmate(self, color):
         # chiếu hết
@@ -222,22 +253,35 @@ class ChessBoard():
                 else:
                     r,c = king_piece.get_position()
                     index_king_piece = [r,c]
-                    for piece in opponent.get_pieces(self):
+                    for piece in opponent.get_pieces():
                         if not piece.is_captured():
                             if index_king_piece in piece.legal_move():
                                 return True
                     return False
 
 
-    def promote_to_queen(self, index):
-        piece = self.get_piece(index)
-        if isinstance(piece, Pawn):
-            row, col = piece.get_position()
-            if (piece.get_color() == "white" and row == 7) or \
-               (piece.get_color() == "black" and row == 0):
-                self.grid[index] = Queen(piece.get_color(), piece.get_player(), [row, col])
-                piece.get_player().replace_piece(piece, self.grid[index]) # replace_piece(piece, self.grid[index]) chua code ham nay
+    # remove this function
+    # def promote_to_queen(self, index):
+    #     piece = self.get_piece(index)
+    #     if isinstance(piece, Pawn):
+    #         row, col = piece.get_position()
+    #         if (piece.get_color() == "white" and row == 7) or \
+    #            (piece.get_color() == "black" and row == 0):
+    #             self.grid[index] = Queen(piece.get_color(), piece.get_player(), [row, col])
+    #             piece.get_player().replace_piece(piece, self.grid[index]) # replace_piece(piece, self.grid[index]) chua code ham nay
 
+
+
+    def stalemate(self, color):
+        if self.get_game().get_current_turn() == color:
+            current_player = self.get_game().get_whitePlayer() if color == "white" else self.get_game().get_blackPlayer()
+            for piece in current_player.get_pieces():
+                if not piece.is_captured():
+                    if piece.legal_move() is not None:
+                        return False
+                    else:
+                        continue
+            return True
 
 
     def to_unicode_matrix(self):
@@ -252,3 +296,6 @@ class ChessBoard():
             x += 1
         
         return board_matrix
+    
+    def get_grid(self):
+        return self.grid

@@ -52,6 +52,9 @@ class Queen(ChessPieces):
     def get_position(self):
         return super().get_position()
 
+    def get_index(self):
+        return super().get_index()
+
     def set_position(self, new_position):
         return super().set_position(new_position)
 

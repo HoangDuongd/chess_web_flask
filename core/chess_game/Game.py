@@ -15,8 +15,9 @@ class ChessGame():
         self.current_turn = "white"  # hoặc random
         self.winner = "ongoing"
         self.ended = False
-        self.setup()
         self.moves = []
+        self.setup()
+        
     
 
     def setup(self):

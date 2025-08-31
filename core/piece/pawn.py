@@ -48,19 +48,23 @@ class Pawn(ChessPieces):
         # --- Bắt tốt qua đường (en passant) ---
         last_move = board.get_game().last_move()
         if last_move:
-            from_idx, to_idx, moved_piece,category, promotion = last_move
-            if moved_piece.__class__.__name__ == "Pawn":
+            from_idx, to_idx, moved_piece = last_move.get_move().get_from_idx(), last_move.get_move().get_to_idx(), last_move.get_move().get_moved_piece()
+            # target piece must be opponent's pawn
+            if moved_piece.__class__.__name__ == "Pawn" and moved_piece.get_color() != self.get_color():
                 fr, fc = divmod(from_idx, 8)
                 tr, tc = divmod(to_idx, 8)
 
-                # Kiểm tra nếu đối thủ vừa đi tốt 2 ô
-                if abs(fr - tr) == 2 and tr == r:  
-                    # Nếu tốt của ta đang cạnh ngang (trái hoặc phải)
-                    if abs(tc - c) == 1:
-                        # Ô sau lưng tốt đối thủ (nơi ta sẽ ăn qua đường)
-                        en_passant_square = (r + direction) * 8 + tc
-                        moves.append(en_passant_square)
+                # Kiểm tra nếu đối thủ vừa đi tốt 2 ô from start row
+                is_double_push = (
+                    (moved_piece.get_color() == "white" and fr == 1 and tr == 3) or
+                    (moved_piece.get_color() == "black" and fr == 6 and tr == 4)
+                )
 
+                if is_double_push and tr == r and abs(tc - c) == 1:
+                    en_passant_square = (r + direction) * 8 + tc
+                    # 3) ô en passant phải trống (nên là trống)
+                    if board.get_piece(en_passant_square) is None:
+                        moves.append(en_passant_square)
         return moves
 
     
@@ -70,6 +74,9 @@ class Pawn(ChessPieces):
 
     def get_position(self):
         return super().get_position()
+
+    def get_index(self):
+        return super().get_index()
 
     def set_position(self, new_position):
         return super().set_position(new_position)
