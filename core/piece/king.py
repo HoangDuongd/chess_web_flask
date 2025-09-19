@@ -45,11 +45,13 @@ class King(ChessPieces):
 
         return moves
 
+    def get_type(self):
+        return "King"
 
     def get_castle_move(self, piece:'Rook'):
         board = self.get_player().get_board()
         step = 1 if self.get_Rook_Kingside() == piece else -1
-        if not self.get_hasmove() and not piece.get_hasmove():
+        if not self.get_hasmove() and not piece.get_hasmove() and not piece.is_captured():
             if self.get_Rook_Kingside() == piece or self.get_Rook_Queenside() == piece:
                 for index in range(self.get_index() + step, piece.get_index(), step):
                     if board.get_piece(index) is not None:

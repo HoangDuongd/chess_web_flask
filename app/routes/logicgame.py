@@ -5,6 +5,11 @@ import sys
 from core.chess_game.player import Player
 from core.chess_game.Game import ChessGame
 from core.chess_game.bot import Bot_ROOKIE
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from core.piece import Queen,Bishop,Knight,Rook
+else:
+    from core.piece import Queen,Bishop,Knight,Rook
 
 
 # --- Khởi tạo Game ---
@@ -16,7 +21,12 @@ game = ChessGame(player1, bot, typegame="blizt")
 chessgame_bp = Blueprint('logicgame', __name__)
 
 
-
+CLASS_MAP = {
+ "Q": Queen,
+ "R": Rook,
+ "N": Knight,
+ "B": Bishop
+}
 
 
 @chessgame_bp.route("/api/board")
@@ -35,7 +45,13 @@ def get_piece(): # add the object game as parameter into this function
     y = int(request.args.get("y"))
     index = x * 8 + y
     piece = game.get_board().get_piece(index)
-    return jsonify({"exists": piece is not None})
+    if piece is not None:
+        return jsonify({"exists": True, 
+                        "color":piece.get_color(),
+                        "type":piece.get_type(),
+                        "position":piece.get_position()})
+    else:
+        return jsonify({"exists":False})
 
 @chessgame_bp.route("/api/legal_moves")
 def get_legal_moves(): # add the object game as parameterr into this function
@@ -56,7 +72,8 @@ def make_move(): # add the object game as parameterr into this function
     data = request.get_json()
     from_pos = data["from"][0] * 8 + data["from"][1]
     to_pos = data["to"][0] * 8 + data["to"][1]
-    game.get_board().move_piece(from_pos, to_pos)
+    promotion = CLASS_MAP.get(data["promotion"])
+    game.get_board().move_piece(from_pos, to_pos,promotion)
     if game.Game_status():
         return jsonify({
             "status": "end",

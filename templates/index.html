@@ -41,40 +41,10 @@
         </div>
     </div>
 
-
-
-<!-- <script>
-async function fetchBoard() {
-    const response = await fetch("/api/board");
-    const data = await response.json();
-    const board = data.board;
-
-    const boardContainer = document.getElementById("chess-board");
-    boardContainer.innerHTML = "";
-
-    for (let i = 0; i < board.length; i++) {
-        for (let j = 0; j < board[i].length; j++) {
-            const square = document.createElement("div");
-            square.classList.add("chess-square");
-
-            const isWhite = (i + j) % 2 === 0;
-            square.classList.add(isWhite ? "white-square" : "black-square");
-
-            if (board[i][j]) {
-                square.textContent = board[i][j];  // Unicode piece
-            }
-
-            boardContainer.appendChild(square);
-        }
-    }
-}
-
-window.onload = fetchBoard;
-</script> -->
-
 <script>
-let selected = null;
+// let selected = null;
 let legalMoves = [];
+let selected_piece = null
 
 async function fetchBoard() {
     const response = await fetch("/api/board");
@@ -112,122 +82,31 @@ async function fetchBoard() {
 async function handleSquareClick(i, j) {
     // Nếu click vào ô hợp lệ -> di chuyển
     if (legalMoves.some(pos => pos[0] === i && pos[1] === j)) {
-        const res = await fetch(`/api/move`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ from: selected, to: [i, j] })
-        });
-
-        const data = await res.json();
-
-        selected = null;
-        legalMoves = [];
-
-        if (data.status === "end") {
-            showEndGame(data.winner);  // 'white' hoặc 'black'
+        if (selected_piece.type == "Pawn" && (i == 7 || i == 0)){
+            showPromotionPopup(selected_piece.position, [i,j])
         }
-
-        await fetchBoard();
-        return;
+        else {
+            await sendMove(selected_piece.position, [i,j])
+        }
+            return;
     }
 
     // Nếu click vào quân cờ -> hiển thị nước đi
     const res = await fetch(`/api/piece?x=${i}&y=${j}`);
-    const data = await res.json();
+    selected_piece = await res.json();
 
-    if (data.exists) {
-        selected = [i, j];
+    if (selected_piece.exists) {
+        selected_piece.position = [i, j];
         const legal_movesRes = await fetch(`/api/legal_moves?x=${i}&y=${j}`);
         const Data = await legal_movesRes.json();
         legalMoves = Data.moves;
     } else {
-        selected = null;
+        selected_piece = null;
         legalMoves = [];
     }
 
     await fetchBoard();
 }
-
-
-// nho xoa code sau:
-// async function handleSquareClick(i, j) {
-//     // Nếu click vào ô hợp lệ -> di chuyển
-//     if (legalMoves.some(pos => pos[0] === i && pos[1] === j)) {
-//         const res = await fetch(`/api/move`, {
-//             method: "POST",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify({ from: selected, to: [i, j] })
-//         });
-
-//         const data = await res.json();
-
-//         selected = null;
-//         legalMoves = [];
-
-//         if (data.status === "end") {
-//             showEndGame(data.winner);
-//             await fetchBoard();
-//             return;
-//         }
-
-//         // Cập nhật bàn cờ sau khi người chơi đánh
-//         await fetchBoard();
-
-//         // Nếu tới lượt bot -> gọi bot-move
-//         if (data.next_turn === "black") {
-//             await callBotMove();
-//         }
-
-//         return;
-//     }
-
-//     // Nếu click vào quân cờ -> hiển thị nước đi
-//     const res = await fetch(`/api/piece?x=${i}&y=${j}`);
-//     const data = await res.json();
-
-//     if (data.exists) {
-//         selected = [i, j];
-//         const legal_movesRes = await fetch(`/api/legal_moves?x=${i}&y=${j}`);
-//         const Data = await legal_movesRes.json();
-//         legalMoves = Data.moves;
-//     } else {
-//         selected = null;
-//         legalMoves = [];
-//     }
-
-//     await fetchBoard();
-// }
-
-// async function callBotMove() {
-//     const res = await fetch("/api/bot-move", { method: "POST" });
-//     const data = await res.json();
-
-//     if (data.status === "end") {
-//         showEndGame(data.winner);
-//     }
-
-//     await fetchBoard();
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 function showEndGame(winner) {
@@ -238,6 +117,41 @@ function showEndGame(winner) {
 }
 
 
+function showPromotionPopup(from, to) {
+    const popup = document.createElement("div");
+    popup.classList.add("promotion-popup");
+    popup.innerHTML = `
+        <div>Chọn quân để phong cấp:</div>
+        <button onclick="promote('Q')">♛ Hậu</button>
+        <button onclick="promote('R')">♜ Xe</button>
+        <button onclick="promote('B')">♝ Tượng</button>
+        <button onclick="promote('N')">♞ Mã</button>
+    `;
+    document.body.appendChild(popup);
+
+    window.promote = async function(piece) {
+        document.body.removeChild(popup);
+        await sendMove(from, to, piece);
+    }
+}
+
+async function sendMove(from_position, to_position, promotion_type = null) {
+    const res = await fetch(`/api/move`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ from:from_position, to:to_position, promotion:promotion_type })
+    });
+    const data = await res.json();
+
+    selected_piece = null;
+    legalMoves = [];
+
+    if (data.status === "end") {
+        showEndGame(data.winner);
+    }
+
+    await fetchBoard();
+}
 
 
 window.onload = fetchBoard;

@@ -92,6 +92,7 @@ class Promotion(Move):
         r,c = divmod(self.to_index, 8)
         new_prom = self.Prom(self.piece.get_color(), self.piece.get_player(), position = [r,c])
         board.set_piece(self.to_index, new_prom)
+        board.remove_piece(self.from_index)
         return "promotion"
 
 

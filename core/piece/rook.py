@@ -39,7 +39,8 @@ class Rook(ChessPieces):
 
         return moves
 
-
+    def get_type(self):
+        return "Rook"
 
     def legal_move(self):
         return super().legal_move()

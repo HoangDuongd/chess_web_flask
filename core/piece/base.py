@@ -17,7 +17,9 @@ class ChessPieces(ABC):
     @abstractmethod
     def get_attack_square(self):
         pass
-
+    @abstractmethod
+    def get_type(self):
+        pass
     def legal_move(self):
         board = self.get_player().get_board()
         legal_moves = []

@@ -44,7 +44,8 @@ class Queen(ChessPieces):
 
         return moves
 
-
+    def get_type(self):
+        return "Queen"
 
     def legal_move(self):
         return super().legal_move()

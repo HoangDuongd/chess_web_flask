@@ -35,7 +35,8 @@ class Knight(ChessPieces):
 
         return moves
     
-
+    def get_type(self):
+        return "Knight"
 
 
     def legal_move(self):

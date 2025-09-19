@@ -67,6 +67,8 @@ class Pawn(ChessPieces):
                         moves.append(en_passant_square)
         return moves
 
+    def get_type(self):
+        return "Pawn"
     
     def legal_move(self):
         return super().legal_move()
